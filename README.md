@@ -11,6 +11,16 @@ NEXUS AI is a neutral, provider-agnostic collaborative intelligence platform. It
 - Provider selection and task routing happen behind the scenes. The user does not need to pick a model.
 - Provider availability, capability, evidence quality, privacy, and cost are measured transparently; equal footing does not mean pretending all systems have identical capabilities.
 
+## Multimodal creative agents
+
+NEXUS is intended to coordinate more than text chat. It will have specialist integrations for:
+- **Audio:** speech generation, transcription, voice agents, dubbing, sound effects, and music (e.g. ElevenLabs and other verified audio APIs).
+- **Video:** text/image/video-to-video generation, editing, avatars, lip-sync, and post-processing (e.g. Runway, fal, Replicate, Google Veo, Kling, Luma, and other verified providers).
+- **Images and design:** image generation, editing, upscaling, and asset workflows.
+- **3D and real-time media:** evaluated as separate capability classes.
+
+These are integration targets, not claims that accounts, API keys, or live integrations are already configured. See [docs/MEDIA_CAPABILITIES.md](docs/MEDIA_CAPABILITIES.md).
+
 ## Project goals
 
 - Connect hosted and self-hosted AI model providers through one interface.
@@ -38,4 +48,4 @@ This repository currently contains project and architecture documentation. It do
 
 ## Integration strategy
 
-Build a provider-neutral gateway and agent registry. Evaluate LiteLLM for model access, MCP for tool connectivity, and A2A for external agent collaboration. Verify each integration against current vendor APIs, account access, model availability, pricing, and usage limits before enabling it.
+Build provider-neutral gateways for both reasoning models and media-generation services. Evaluate LiteLLM for language-model access, MCP for tool connectivity, and A2A for agent collaboration. For media, evaluate a mix of specialist APIs and multi-provider aggregators. Verify each integration against current vendor APIs, account access, model availability, pricing, and usage limits before enabling it.
