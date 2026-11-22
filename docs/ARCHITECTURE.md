@@ -1,21 +1,39 @@
 # NEXUS AI Architecture
 
-## 1. Product shape
+## 1. Product principle: neutral collaborative intelligence
 
-NEXUS AI is a control plane for multiple AI providers and specialized agents. It should not attempt to copy every vendor's product. It should expose common capabilities through adapters, then coordinate work through a central orchestration layer.
+NEXUS is not a wrapper that makes one AI the boss and treats others as optional add-ons. It is a neutral coordination layer. All connected providers and agents enter through documented adapters and receive equal standing in the collaboration process.
+
+The user should not have to choose a model. The user gives NEXUS a task; NEXUS coordinates the connected systems, manages the work, and returns one synthesized result with important disagreements and source attribution visible when useful.
+
+Equal footing means equal opportunity to contribute under consistent policies. It does not mean claiming every model has identical capabilities, forcing every provider into every request, or hiding costs and limitations.
 
 ## 2. Logical components
 
 1. **Client applications** — Android-first application and responsive web client.
-2. **NEXUS API** — authentication, user settings, conversation/session management, policy enforcement, and audit events.
-3. **Orchestrator** — plans tasks, selects agents/models, delegates work, handles retries/timeouts, and combines results.
-4. **Provider gateway** — a normalized interface to hosted and self-hosted model providers. Evaluate LiteLLM as the initial gateway.
-5. **Agent registry** — stores agent identity, description, capabilities, supported tools, provider/model preferences, version, and permission profile.
-6. **Tool gateway** — exposes approved tools through MCP-compatible interfaces; validates authorization and input/output schemas.
-7. **Agent interoperability** — evaluate A2A for communication with independently hosted agents.
-8. **Persistence and observability** — PostgreSQL for durable records; structured logs, usage/cost tracking, traces, and audit history.
+2. **NEXUS API** — authentication, settings, sessions, policy enforcement, approvals, and audit events.
+3. **Neutral orchestrator** — decomposes tasks, invites relevant connected agents, coordinates parallel work, compares results, resolves conflicts, and synthesizes the response.
+4. **Provider gateway** — normalized access to hosted and self-hosted model providers; evaluate LiteLLM.
+5. **Provider/model registry** — stores provider identity, supported models, capabilities, health, access state, cost metadata, and verification status.
+6. **Agent registry** — stores agent identity, capabilities, tools, endpoint/handler, version, and permission profile.
+7. **Tool gateway** — approved tools exposed through MCP-compatible interfaces with authorization and schema validation.
+8. **Agent interoperability** — evaluate A2A for independent agent discovery and communication.
+9. **Persistence and observability** — PostgreSQL for durable metadata, sessions, usage, traces, and audit events.
 
-## 3. Provider strategy
+## 3. Neutrality and collaboration rules
+
+- No provider receives a permanent ranking advantage or exclusive authority.
+- Provider adapters implement the same common contract and pass the same integration tests.
+- The orchestrator is provider-neutral and cannot be controlled by a provider being evaluated.
+- For substantive tasks, the default policy should request independent contributions from the broadest practical set of connected, relevant agents, subject to the user's cost, latency, privacy, and availability settings.
+- For simple or latency-sensitive tasks, NEXUS may use a smaller set automatically; this is an operational optimization, not a user-facing model choice.
+- Agents should initially work independently when practical to reduce groupthink and anchoring.
+- The synthesis stage compares claims, evidence, uncertainty, and disagreements. It must not resolve a disagreement by provider brand or popularity.
+- Preserve dissenting, well-supported views rather than manufacturing consensus.
+- A single final response is presented to the user, with expandable collaboration details and attribution where useful.
+- Never claim an agent participated unless its call succeeded and its output was received.
+
+## 4. Provider strategy
 
 Potential provider families to evaluate (not yet connected):
 
@@ -23,106 +41,94 @@ Potential provider families to evaluate (not yet connected):
 - Anthropic
 - Google Gemini
 - xAI
-- Meta Llama (hosted or self-hosted distributions)
+- Meta Llama (hosted or self-hosted)
 - Mistral
 - DeepSeek
 - Cohere
 - Perplexity
 - Amazon Bedrock
 - Microsoft Azure AI
-- NVIDIA-hosted and self-hosted inference
+- NVIDIA inference
 - Qwen and other compatible open-weight models
 
-A provider is not considered integrated merely because it appears in this list. Each adapter must pass authentication, model discovery, basic generation, streaming (if supported), error handling, rate-limit handling, and cost/usage tests.
+A provider is not integrated merely because it appears in this list. Each adapter must pass authentication, model discovery, request/response, streaming where supported, error handling, rate-limit handling, usage/cost capture, and security tests. Some services expose models rather than independent agents; NEXUS should accurately distinguish the two.
 
-## 4. Agent registry model
+## 5. Orchestration lifecycle
 
-Each registered agent should have, at minimum:
+1. Receive the user's task and constraints once.
+2. Classify task type, sensitivity, required tools, and expected output.
+3. Find available agents by verified capabilities, not marketing claims.
+4. Apply the user's collaboration policy, privacy constraints, budget, and latency limits.
+5. Dispatch independent subtasks in parallel where safe; give each agent only necessary context.
+6. Collect outputs with provider/agent identity, model/version, timestamps, and usage metadata.
+7. Validate outputs, compare evidence, identify contradictions, and request targeted follow-up where worthwhile.
+8. Synthesize one coherent answer, explicitly preserving material uncertainty and unresolved disagreement.
+9. Present one answer and optionally an audit view of which agents contributed.
+10. Record usage, cost, latency, failures, and quality feedback for continuous evaluation.
 
-- Stable agent ID and human-readable name
+## 6. Agent registry model
+
+Each registered agent needs:
+- Stable ID and human-readable name
 - Description and capability tags
-- Endpoint or internal handler reference
-- Supported input/output schema
-- Provider/model requirements (if any)
-- Tool allowlist
-- Permission tier
+- Endpoint or internal handler
+- Input/output schema
+- Provider/model requirements, if any
+- Tool allowlist and permission scope
 - Timeout, retry, and rate-limit policy
 - Version, health status, and last verification time
 
-Do not treat an agent's self-description as proof of its capabilities. Validate declared capabilities and enforce them at runtime.
+Self-described capabilities are not proof. Validate them at runtime.
 
-## 5. Orchestration behavior
+## 7. Security and privacy boundaries
 
-The orchestrator should:
+- Provider credentials stay server-side and never reach the mobile client.
+- Encrypt secrets at rest; support rotation and revocation.
+- Apply least-privilege, per-user and per-agent tool scopes.
+- Require explicit approval for financial transactions, account changes, sending messages, publishing, deleting data, and other consequential actions.
+- Log tool calls and approval decisions; redact secrets and sensitive data.
+- Treat prompts, retrieved documents, tool results, and agent outputs as untrusted data.
+- Provide per-user budgets, rate limits, usage visibility, and an emergency disable control.
+- Respect provider data retention and training settings; disclose when data must be sent to an external provider.
 
-1. Classify the user's task and constraints.
-2. Select the smallest suitable set of agents.
-3. Provide each agent only the context required for its task.
-4. Run independent tasks in parallel when safe.
-5. Require explicit user approval for consequential external actions.
-6. Validate outputs, resolve disagreements, and produce a traceable final result.
-7. Record provider/model usage and estimated cost.
-
-A multi-agent response should not be assumed to be more accurate merely because more agents participated.
-
-## 6. Security and privacy boundaries
-
-- Provider credentials stay on the server and are never sent to the mobile client.
-- Use per-user secrets, encrypted at rest, with rotation and revocation support.
-- Apply least-privilege tool permissions and per-agent scopes.
-- Require confirmation before financial transactions, account changes, sending messages, publishing content, deleting data, or other consequential actions.
-- Use audit logs for tool calls and approval decisions.
-- Redact secrets and sensitive data from logs.
-- Treat prompts, retrieved documents, tool results, and other agent outputs as untrusted data.
-- Provide usage limits, budgets, rate limits, and emergency disable controls.
-
-## 7. Suggested implementation phases
+## 8. Suggested implementation phases
 
 ### Phase 1 — Foundation
-- Confirm application runtime and deployment target.
+- Confirm the existing app runtime and deployment target.
 - Establish backend API and configuration conventions.
-- Add provider gateway abstraction and health checks.
-- Add provider/model registry and secure credential handling.
-- Add tests with mocked provider responses.
+- Define common provider adapter contract and provider registry.
+- Add secure credential handling, health checks, and mocked adapter tests.
+- Establish neutral collaboration policy and usage controls.
 
-### Phase 2 — First live providers
-- Integrate OpenAI and Anthropic first.
-- Add Gemini, xAI, and additional compatible providers incrementally.
-- Verify each adapter against current vendor documentation and account access.
+### Phase 2 — Provider adapters
+- Implement and verify initial provider adapters.
+- Add more providers incrementally through the same contract.
+- Do not privilege any provider in orchestration defaults.
 
-### Phase 3 — Agents and orchestration
-- Add agent registry and capability discovery.
-- Add task planner, delegation, result aggregation, and execution traces.
+### Phase 3 — Collaboration engine
+- Add agent registry, task planner, parallel delegation, evidence comparison, synthesis, traces, and cost accounting.
 - Add MCP tool gateway with explicit permission scopes.
 
 ### Phase 4 — Interoperability
-- Evaluate A2A for external agent discovery and communication.
-- Add import/registration workflow for trusted third-party agents.
-- Require verification and permission review before activation.
+- Evaluate A2A for external agent discovery and collaboration.
+- Add trusted agent registration and verification workflow.
 
 ### Phase 5 — Android experience
-- Build the command center, agent catalog, task activity, approvals, settings, and usage dashboard.
-- Keep sensitive provider credentials and orchestration on the backend.
+- Build the single-input command center, agent activity view, approvals, settings, and usage dashboard.
+- Keep secrets and orchestration on the backend.
 
-## 8. Initial technical choices to validate
+## 9. Technical choices to validate
 
-- **Provider gateway:** LiteLLM is a candidate for normalizing access to many model providers; validate current supported providers, license, deployment needs, and feature gaps.
-- **Agent orchestration:** choose a framework only after confirming the existing app stack; evaluate LangGraph and comparable options.
-- **Agent interoperability:** evaluate the current A2A specification and ecosystem.
-- **Tool interoperability:** use MCP where it provides a clear tool integration boundary.
-- **Database:** PostgreSQL for users, provider configuration metadata, agent registry, sessions, usage, and audit events. Secrets should use a dedicated secrets mechanism rather than plain database fields.
+- Provider gateway: evaluate LiteLLM for provider normalization, current support, license, and feature gaps.
+- Orchestration: evaluate LangGraph and alternatives only after confirming the existing stack.
+- Agent interoperability: evaluate current A2A specification and ecosystem.
+- Tool interoperability: use MCP where it provides a clear boundary.
+- Database: PostgreSQL for users, provider metadata, agent registry, sessions, usage, and audit events. Store secrets in a dedicated secrets mechanism, not plain database fields.
 
-## 9. Definition of done for an integration
+## 10. Definition of done
 
-A provider or agent may be marked **Verified** only after:
-- credentials are configured securely;
-- a health or connectivity check succeeds;
-- a representative request succeeds;
-- expected errors and rate limits are handled;
-- timeout and retry behavior are tested;
-- usage/cost data is captured where available;
-- permissions and data handling are documented.
+An integration is Verified only after secure credentials, successful connectivity and representative requests, error/rate-limit handling, timeout/retry tests, usage capture, permission review, and documented data handling.
 
-## 10. Current status
+## 11. Current status
 
-The repository is being initialized with architecture documentation. No provider adapters, agent orchestration, MCP server, A2A integration, or Android application are claimed to be implemented yet.
+This repository currently contains architecture documentation only. No provider adapters, live orchestration, MCP server, A2A integration, or Android app are yet implemented.
