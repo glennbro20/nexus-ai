@@ -182,4 +182,4 @@ An integration is Verified only after secure credentials, successful connectivit
 
 ## 12. Current status
 
-This repository currently contains architecture documentation only. No provider adapters, live orchestration, media generation integration, MCP server, A2A integration, or Android app are yet implemented.
+This repository now contains an initial TypeScript media foundation: shared request/job/provider contracts, capability registry, budget-aware routing, a mock provider, and automated tests. This foundation does not generate real media or persist jobs. No live provider adapters, deployed API, database persistence, object storage, MCP server, A2A integration, or Android app are yet implemented. See [docs/IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
