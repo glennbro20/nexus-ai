@@ -1,31 +1,41 @@
 # NEXUS AI
 
-NEXUS AI is a provider-agnostic, multi-agent workspace designed to connect AI model providers, discover specialized agents, and coordinate work through a central orchestrator.
+NEXUS AI is a neutral, provider-agnostic collaborative intelligence platform. Its purpose is to bring many AI providers and specialized agents into one workspace so they can contribute together without making the user choose a favorite.
+
+## Core principle: equal footing
+
+- No provider is the default owner, privileged voice, or permanent "best" AI.
+- The user asks once; NEXUS coordinates the work across the connected systems.
+- When useful and within the user's configured budget/latency policy, multiple connected providers contribute independently and in parallel.
+- NEXUS compares evidence, surfaces meaningful disagreements, and synthesizes one clear response.
+- Provider selection and task routing happen behind the scenes. The user does not need to pick a model.
+- Provider availability, capability, evidence quality, privacy, and cost are measured transparently; equal footing does not mean pretending all systems have identical capabilities.
 
 ## Project goals
 
-- Connect multiple hosted and self-hosted AI model providers through one interface.
-- Maintain a provider and model registry with capability metadata.
-- Register and invoke specialized agents through controlled tool interfaces.
-- Support agent-to-agent collaboration and Model Context Protocol (MCP) integrations.
-- Provide an Android-first user experience, with a responsive web interface.
-- Keep provider credentials server-side and enforce explicit permissions for consequential actions.
+- Connect hosted and self-hosted AI model providers through one interface.
+- Maintain a provider/model registry with capability and health metadata.
+- Register specialized agents and let them collaborate through controlled interfaces.
+- Support MCP tool integrations and evaluate A2A for agent-to-agent interoperability.
+- Provide an Android-first experience and responsive web client.
+- Keep credentials server-side and require approval for consequential actions.
 
-## Architecture direction
+## Architecture
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the proposed architecture, integration phases, security boundaries, and initial provider strategy.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/COLLABORATION_PRINCIPLES.md](docs/COLLABORATION_PRINCIPLES.md).
 
 ## Development status
 
-This repository is being initialized. No production integrations or deployed agent orchestration should be assumed until implemented and tested.
+This repository currently contains project and architecture documentation. It does not yet contain a working mobile app, backend, provider adapters, or live multi-agent orchestration. Those components must be implemented and tested before they are described as operational.
 
 ## Security
 
 - Never commit API keys, access tokens, passwords, or personal financial/medical data.
 - Use environment variables or a managed secrets store for credentials.
-- Keep tool permissions least-privilege and require confirmation for consequential external actions.
-- Treat provider responses and agent outputs as untrusted input.
+- Apply least-privilege permissions and require approval for consequential external actions.
+- Treat provider responses, retrieved content, and agent outputs as untrusted input.
+- Provide cost limits, rate limits, audit logs, and an emergency disable control.
 
-## Initial integration strategy
+## Integration strategy
 
-Start with a provider gateway abstraction (evaluate LiteLLM) rather than hard-coding each vendor into the application. Add providers incrementally and verify their current API, authentication, model availability, pricing, and usage limits before enabling them.
+Build a provider-neutral gateway and agent registry. Evaluate LiteLLM for model access, MCP for tool connectivity, and A2A for external agent collaboration. Verify each integration against current vendor APIs, account access, model availability, pricing, and usage limits before enabling it.
