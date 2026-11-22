@@ -36,7 +36,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/COLLABORATION_PRINCIP
 
 ## Development status
 
-This repository currently contains project and architecture documentation. It does not yet contain a working mobile app, backend, provider adapters, or live multi-agent orchestration. Those components must be implemented and tested before they are described as operational.
+This repository now contains project documentation and an initial TypeScript media-orchestration foundation: shared media contracts, a capability registry, a budget-aware router, a mock provider, and automated tests. The mock workflow is not a live media service. There is not yet a deployed API, database persistence, object storage, real provider adapter, Android app, or live multi-agent orchestration. See [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md).
 
 ## Security
 
